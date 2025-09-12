@@ -65,6 +65,17 @@ def main():
     acc = accuracy_score(y_te, y_pred)
     roc_auc = plot_roc(y_te, y_proba, args.fig_out)
 
+    from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
+
+    cm = confusion_matrix(y_te, y_pred)
+    disp = ConfusionMatrixDisplay(cm)
+    disp.plot()
+    plt.title("Confusion Matrix")
+    plt.savefig("reports/figures/cm.png", dpi=160, bbox_inches="tight")
+    plt.close()
+
+    
+
     dump(model, args.model_out)
 
     print("== Training Summary ==")
