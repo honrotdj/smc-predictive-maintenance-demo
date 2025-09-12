@@ -1,30 +1,85 @@
-# Predictive Maintenance Demo (SMC Project)
+# Predictive Maintenance Demo (SMC-inspired)
 
-**Repo:** `smc-predictive-maintenance-demo`  
-**Goal:** Simulate factory sensor data and train a simple machine‑learning model (Logistic Regression) to estimate the risk of machine failure.  
-**Why this matters for SMC:** It showcases curiosity and alignment with SMC’s focus on automation, reliability, and smart maintenance — in a *clean, beginner‑friendly* demo.
+Beginner-friendly, runnable demo. It **simulates device readings** (pressure / temperature / vibration / usage) with a simple device identity + health flags, **trains a Logistic Regression model**, and **prints a failure-risk score** for new data.  
+If a row looks suspicious (**unknown device** / **tamper flag**), it also prints a short **SECURITY NOTE** — tying reliability to basic OT security hygiene.
 
-> This is a **learning/demo** project, not production software.
-
----
-
-## What this v1 demo will include
-
-- **Data Simulation**: Generate fake sensor readings for a few machines  
-  Columns: `timestamp, pressure, temperature, vibration, cycle_count, fault`
-- **Modeling**: Train a **Logistic Regression** classifier to predict `fault` (0/1)
-- **Evaluation**: Save **one figure** (ROC/AUC or confusion matrix) to `reports/figures/`
-- **Prediction**: Print a **risk score** (probability of failure) for new readings
-- **Documentation**: Clear README and comments throughout
+> This is a small learning project, not production software.
 
 ---
 
-## Project Structure
+## Quickstart
+
+```bash
+pip install -r requirements.txt
+python src/simulate.py --rows 1200
+python src/train.py
+python src/predict.py --from_csv data/sample.csv
+```
+
+**What these do**  
+- `simulate.py` → writes `data/sample.csv` with columns:  
+  `timestamp, device_id, port_class, pressure, temperature, vibration, cycle_count, sensor_health, cable_loss_flag, tamper, fault`
+- `train.py` → trains a Logistic Regression and saves:
+  - `model.joblib`
+  - figures: `reports/figures/roc.png`, `reports/figures/cm.png`
+- `predict.py` → prints a risk score for a new reading (0=low, 1=high) and a maintenance note.  
+  If `device_id` is `UNKNOWN-###` or `tamper==1`, it also prints a **SECURITY NOTE**.
+
+---
+
+## Predict in three ways
+
+**A) Use the last row of the CSV**  
+```bash
+python src/predict.py --from_csv data/sample.csv
+```
+
+**B) Inline JSON (Windows cmd quoting example)**  
+```bash
+python src/predict.py --json "{\"pressure\":110,\"temperature\":71,\"vibration\":1.6,\"cycle_count\":4200,\"device_id\":\"UNKNOWN-777\",\"tamper\":1}"
+```
+
+**C) Raw numbers**  
+```bash
+python src/predict.py --pressure 102 --temperature 64 --vibration 1.2 --cycle_count 1500
+```
+
+---
+
+## Example output
+
+```
+== Prediction ==
+Device -> SEN-001
+Input  -> pressure=97.174, temperature=61.766, vibration=1.251, cycle_count=686
+Risk   -> 0.053 (0=low, 1=high)
+Label  -> 0
+Note   -> Low risk — keep running.
+```
+
+If suspicious:
+```
+SECURITY NOTE -> unknown device id, tamper flag set
+```
+
+---
+
+## Figures
+
+- ROC curve: `reports/figures/roc.png`  
+- Confusion matrix: `reports/figures/cm.png`
+
+You can attach these images in an email when you share the repo.
+
+---
+
+## Project structure
 
 ```
 smc-predictive-maintenance-demo/
 ├── README.md
 ├── requirements.txt
+├── devices.json
 ├── data/
 │   └── sample.csv
 ├── src/
@@ -34,65 +89,26 @@ smc-predictive-maintenance-demo/
 │   └── predict.py
 └── reports/
     └── figures/
-```
-
-> `data/sample.csv` is a placeholder now. We’ll generate real samples in **Step 2**.
-
----
-
-## Prerequisites
-
-- Python **3.10+**
-- `pip` (comes with Python)
-- (Optional) Git + GitHub for version control
-
-Install dependencies (after you create/activate a virtual environment if you want one):
-
-```bash
-pip install -r requirements.txt
+        ├── roc.png
+        └── cm.png
 ```
 
 ---
 
-## Quickstart (will work after we implement each step)
+## Why this is relevant
 
-1. **Simulate data** (Step 2)  
-   ```bash
-   python src/simulate.py
-   ```
-2. **Train model** (Step 3)  
-   ```bash
-   python src/train.py
-   ```
-3. **Predict risk** for a new reading (Step 4)  
-   ```bash
-   python src/predict.py
-   ```
-
-Figures (ROC/AUC or confusion matrix) will be saved to: `reports/figures/`
+- Mirrors how device readings could look in a factory (simple **device_id + health flags**).
+- Trains a **simple, explainable model** (Logistic Regression) for failure risk.
+- Adds a **security-aware note** for unknown/tampered readings (IT/cyber angle).
 
 ---
 
-## Roadmap
+## Tech
 
-- **v1 (MVP)** — simulate → train → predict → save one figure
-- **After MVP (optional)**  
-  - Feature importance chart  
-  - Small **FastAPI** web dashboard  
-  - Simulated packet‑loss mode (wireless sensor realism)  
-  - Plain‑English maintenance recommendation based on risk
-
----
-
-## Talking Points (for SMC recruiters)
-
-- Built a **predictive maintenance** demo that mirrors real factory telemetry (pressure/temperature/vibration) and **failure risk** modeling.
-- Clear, well‑documented code — **beginner‑friendly** but uses industry tools: `pandas`, `scikit‑learn`, `matplotlib`, `numpy`.
-- Thoughtful roadmap (web dashboard, packet loss, recommendations) to extend toward smart maintenance concepts.
-- Clean repo structure and one‑command steps for simulation, training, and prediction.
+Python 3.10+, pandas, scikit-learn, matplotlib, numpy
 
 ---
 
 ## License
 
-MIT (or choose a license you prefer).
+MIT
