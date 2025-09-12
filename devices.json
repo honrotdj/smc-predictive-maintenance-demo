@@ -1,0 +1,10 @@
+{
+  "master_id": "EX600-M1",
+  "port_class": "A",
+  "devices": [
+    {"device_id": "SEN-001", "type": "pressure"},
+    {"device_id": "SEN-002", "type": "temperature"},
+    {"device_id": "SEN-003", "type": "vibration"},
+    {"device_id": "SEN-004", "type": "flow"}
+  ]
+}
