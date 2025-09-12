@@ -18,6 +18,8 @@ Thumbs.db
 # Reports / artifacts
 reports/figures/*
 !reports/figures/.gitkeep
+!reports/figures/roc.png
+!reports/figures/cm.png
 
 # Data (keep sample.csv only)
 data/*
