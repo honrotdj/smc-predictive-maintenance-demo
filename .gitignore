@@ -24,3 +24,4 @@ reports/figures/*
 # Data (keep sample.csv only)
 data/*
 !data/sample.csv
+model.joblib
